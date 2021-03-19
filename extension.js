@@ -53,14 +53,17 @@ function activate(context) {
             enumerable: true
         });
 
+        var nowDate = new Date();
+        var descriptionText = "Code Snippet: " + nowDate.toDateString() + " at " + nowDate.toLocaleTimeString();
         var repoPromise = octokit.gists.create({
             'files': fileWithContent,
-            'description': exactFileName,
+            'description': descriptionText,
             'public': visibility
         });
         repoPromise.then((data) => {
             var gist = data;
             vscode.window.showInformationMessage("Gist Link: " + gist.data.html_url);
+            vscode.env.openExternal(vscode.Uri.parse(gist.data.html_url));
         }).catch((error) => {
             console.log(error);
         });
