@@ -46,6 +46,22 @@ function activate(context) {
         var fileWithContent = {};
         var selectedTextObj = { 'content': selectedText };
         var exactFileName = path.basename(editor.document.fileName);
+        if (path.extname(editor.document.fileName) == "") {
+            var extMap = {};
+            vscode.extensions.all.forEach(e => {
+                if (!e || !e.packageJSON || !e.packageJSON.contributes || !e.packageJSON.contributes.languages) {
+                    return;
+                }
+                e.packageJSON.contributes.languages.forEach(lang => {
+                    extMap[lang.id] = (extMap[lang.id] || []).concat(lang.extensions)
+                })
+            })
+            var languageExtensions = extMap[editor.document.languageId];
+            if (languageExtensions) {
+                exactFileName += languageExtensions[0];
+            }
+        }
+
         Object.defineProperty(fileWithContent, exactFileName, {
             value: selectedTextObj,
             writable: true,
